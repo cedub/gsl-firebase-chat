@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Super Awesome Chat Client</title>
+    <style type="text/css">
+        body {
+            background-color: #F0F0F0;
+        }
+        #messages {
+            width: 500px;
+            height: 500px;
+            background-color: #FFFFFF;
+            padding: 5px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+        #message {
+            width: 500px;
+        }
+        dt {
+            padding: 5px;
+            font-style: italic;
+            clear: both;
+            float: none;
+        }
+        dt.their-author:after {
+            content: ' says:';
+        }
+        dt.my-author {
+            text-align: right;
+        }
+        dt.my-author:after {
+            content: ' say:';
+        }
+
+        dd {
+            background-color: #EEE;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        dd.my-message {
+            background-color: #0090FC;
+            float: right;
+        }
+        dd.their-message {
+            float: left;
+        }
+
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase-database.js"></script>
+</head>
+<body>
+    <div>
+        <div id="messages">Sorry, no messages.</div>
+        <textarea id="message"></textarea><br />
+        <input type="submit" id="send" value="Send">
+    </div>
+    <script type="text/javascript">
+        var person = window.prompt('What is your name?', 'Anonymous');
+
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyCQFZNQ3jImoQZbmMhbv6B67ICPF6bhxh8",
+            authDomain: "gsl-demos.firebaseapp.com",
+            databaseURL: "https://gsl-demos.firebaseio.com",
+            projectId: "gsl-demos",
+            storageBucket: "gsl-demos.appspot.com",
+            messagingSenderId: "855487585479"
+        };
+        firebase.initializeApp(config);
+
+        function saveToFirebase(who, message, time) {
+            var postData = {
+                author: who,
+                body: message,
+                date: time
+            };
+
+            var newPostKey = firebase.database().ref().child('messages').push().key;
+            var updates = {};
+            updates['/ChatClient/messages/' + newPostKey] = postData;
+
+            return firebase.database().ref().update(updates);
+        }
+
+        function rebuildMessages(messages) {
+            var msgs = document.getElementById('messages');
+            while (msgs.hasChildNodes()) {
+              msgs.removeChild(msgs.lastChild);
+            }
+
+            for (var id in messages) {
+                var author = document.createElement('dt');
+                var message = document.createElement('dd');
+                if (person === messages[id].author) {
+                    message.classList = 'chat-message my-message';
+                    author.classList = 'author my-author';
+                    author.appendChild(document.createTextNode('I'));
+                } else {
+                    message.classList = 'chat-message their-message';
+                    author.classList = 'author their-author';
+                    author.appendChild(document.createTextNode(messages[id].author));
+                }
+                message.appendChild(document.createTextNode(messages[id].body));
+                msgs.appendChild(author);
+                msgs.appendChild(message);
+            }
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        var messages = firebase.database().ref('ChatClient/messages');
+        messages.on('value', function(snapshot) {
+            rebuildMessages(snapshot.val());
+        });
+
+        var send = document.getElementById('send');
+        send.addEventListener('click', function (e) {
+            var message = document.getElementById('message');
+            saveToFirebase(person, message.value, (new Date()).getTime());
+            message.value = '';
+        });
+    </script>
+</body>
+</html>
