@@ -1,0 +1,24 @@
+{
+  "name": "chat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.15.3",
+    "ngrok": "^2.2.13"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/cedub/gsl-firebase-chat.git"
+  },
+  "author": "cedub",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cedub/gsl-firebase-chat/issues"
+  },
+  "homepage": "https://github.com/cedub/gsl-firebase-chat#readme"
+}
